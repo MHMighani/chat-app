@@ -8,45 +8,17 @@
 		<link rel="stylesheet" href="./css/styles.min.css" />
 	</head>
 	<body>
-		<div class="chat">
-			<div class="chat__sidebar"></div>
-			<div class="chat__main">
-				<div id="messages" class="chat__messages"></div>
-
-				<div class="compose">
-					<form id="message-form">
-						<input name="message" placeholder="Message" autocomplete="off" />
-						<button type="submit">send</button>
-					</form>
-					<button id="send-location">Send location</button>
-				</div>
-			</div>
-		</div>
-
-		<script id="message-template" type="text/html">
-			<div class="message">
-                <p>
-                    <span class="message__name">some user name</span>
-                    <span class="message__meta">{{createdAt}}</span>
-                </p>
-			    <p>{{message}}</p>
-			</div>
-		</script>
-
-		<script id="location-template" type="text/html">
-			<div class="message">
-			    <p>
-                    <span class="message__name">some user name</span>
-                    <span class="message__meta">{{createdAt}}</span>
-                </p> 
-			    <a href={{url}} target="_blank">My current location</a>
-			</div>
-		</script>
-
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.1.0/mustache.min.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/qs/6.9.3/qs.min.js"></script>
-		<script src="/socket.io/socket.io.js"></script>
-		<script src="/js/chat.js"></script>
+		<div class="centered-form">
+            <div class="centered-form__box">
+                <h1>Join</h1>
+                <form action="/chat.html">
+                    <label>Display name</label>
+                    <input name="username" type="text" placeholder="Display name" required>
+                    <label>Room</label>
+                    <input type="text" name="room" placeholder="room" required>
+                    <button>Join</button>
+                </form>
+            </div>
+        </div>
 	</body>
 </html>
