@@ -32,20 +32,17 @@ $messageForm.addEventListener('submit',e => {
 })
 
 socket.on('sendMessage',message => {
-    console.log(message)
     const html = Mustache.render(messageTemplate,{
-        message
+        message: message.text,
+        createdAt: moment(message.createdAt).format('h:mm a')
     })
     $messages.insertAdjacentHTML('beforeend',html)
 })
 
-socket.on('message',message => {
-    console.log(message)
-})
-
-socket.on('locationMessage',locationURL => {
+socket.on('locationMessage',locationData => {
     const html = Mustache.render(locationTemplate,{
-        locationURL
+        url: locationData.url,
+        createdAt: moment(locationData.createdAt).format('h:mm a')
     })
     $messages.insertAdjacentHTML('beforeend',html)
 })
