@@ -4,6 +4,7 @@ const express = require('express');
 const socektio = require('socket.io');
 const Filter = require('bad-words');
 const { generateMessage,generateLocationMessage } = require('./src/utils/messages');
+const {addUser,removeUser,getUser,getUsersInRoom} = require('./src/utils/users')
 
 const app = express();
 
@@ -24,29 +25,51 @@ app.get('/', (req, res) => {
 io.on('connection', (socket) => {
 	console.log('New websocket connection');
 
-	socket.emit('sendMessage', generateMessage('welcome!'));
-	socket.broadcast.emit('sendMessage', generateMessage('A new user joined!'));
+	socket.on('join',({username,room},callback) => {
+		const { error,user } = addUser({ id: socket.id,username,room })
 
+		if (error) {
+			return callback(error)
+		}
+
+		socket.join(user.room)
+
+		socket.emit('sendMessage', generateMessage('welcome!','Admin'));
+		socket.broadcast.to(user.room).emit('sendMessage', generateMessage(`${user.username} has joined!`,'Admin'));
+
+		callback()
+	})
+	
 	socket.on('sendMessage', (message, callback) => {
 		const filter = new Filter();
+		const user = getUser(socket.id)
 
 		if (filter.isProfane(message)) {
 			return callback('Profanity is not allowed');
 		}
 
-		io.emit('sendMessage', generateMessage(message));
+		io.to(user.room).emit('sendMessage', generateMessage(message,user.username));
 		callback();
 	});
 
 	socket.on('sendLocation', (locationData, callback) => {
-        const url = `https://google.com/maps?q=${locationData.longitude},${locationData.latitude}`;
-		io.emit('locationMessage', generateLocationMessage(url));
+		const user = getUser(socket.id)
+		const url = `https://google.com/maps?q=${locationData.longitude},${locationData.latitude}`;
+		
+		io.to(user.room).emit('locationMessage', generateLocationMessage(url,user.username));
 		callback();
 	});
 
 	socket.on('disconnect', () => {
-		io.emit('sendMessage', generateMessage('A user has left!'));
+		const user = removeUser(socket.id)
+
+		if(user){
+			io.to(user.room).emit('sendMessage', generateMessage(`${user.username} has left!`,'Admin'));
+		}
+
 	});
+
+	
 });
 
 server.listen(PORT, () => {
